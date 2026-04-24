@@ -1,20 +1,46 @@
 from bs4 import BeautifulSoup
 
-# ==========================================
-# ROLE 2: ETL/ELT BUILDER
-# ==========================================
-# Task: Extract product data from the HTML table, ignoring boilerplate.
-
 def parse_html_catalog(file_path):
-    # --- FILE READING (Handled for students) ---
     with open(file_path, 'r', encoding='utf-8') as f:
-        # soup = BeautifulSoup(f, 'html.parser')
-        pass
-    # ------------------------------------------
+        soup = BeautifulSoup(f, 'html.parser')
     
-    # TODO: Use BeautifulSoup to find the table with id 'main-catalog'
-    # TODO: Extract rows, handling 'N/A' or 'Liên hệ' in the price column.
-    # TODO: Return a list of dictionaries for the UnifiedDocument schema.
+    results = []
+    table = soup.find('table', id='main-catalog')
+    if not table:
+        return results
+        
+    headers = [th.get_text(strip=True) for th in table.find_all('th')]
     
-    return []
-
+    for row in table.find_all('tr'):
+        cols = row.find_all('td')
+        if not cols:
+            continue
+            
+        row_dict = {}
+        for idx, col in enumerate(cols):
+            key = headers[idx] if idx < len(headers) else f"col_{idx}"
+            val = col.get_text(strip=True)
+            
+            if key.lower() in ['price', 'giá']:
+                if val.lower() in ['n/a', 'liên hệ']:
+                    val = 0.0
+                else:
+                    clean_val = ''.join(c for c in val if c.isdigit() or c == '.')
+                    try:
+                        val = float(clean_val) if clean_val else 0.0
+                    except ValueError:
+                        val = 0.0
+            
+            row_dict[key] = val
+        
+        doc_id = row_dict.get('id', row_dict.get('ID', ''))
+        results.append({
+            "document_id": str(doc_id),
+            "content": " | ".join(f"{k}: {v}" for k, v in row_dict.items()),
+            "source_type": "HTML",
+            "author": None,
+            "timestamp": None,
+            "source_metadata": row_dict
+        })
+        
+    return results
