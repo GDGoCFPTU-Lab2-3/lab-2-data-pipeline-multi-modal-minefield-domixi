@@ -36,9 +36,34 @@ def main():
     # ----------------------------------------------
 
     # TODO: Call each processing function (extract_pdf_data, clean_transcript, etc.)
+<<<<<<< HEAD
     # TODO: Run quality gates (run_quality_gate) before adding to final_kb
     # TODO: Save final_kb to output_path using json.dump
     
+=======
+    pdf_data = extract_pdf_data(pdf_path)
+    trans_data = clean_transcript(trans_path)
+    html_data = parse_html_catalog(html_path)
+    csv_data = process_sales_csv(csv_path)
+    code_data = extract_logic_from_code(code_path)
+
+    # TODO: Run quality gates (run_quality_gate) before adding to final_kb
+    if pdf_data and run_quality_gate(pdf_data):
+        final_kb.append(pdf_data)
+    if trans_data and run_quality_gate(trans_data):
+        final_kb.append(trans_data)
+    if html_data and run_quality_gate(html_data):
+        final_kb.append(html_data)
+    if csv_data and run_quality_gate(csv_data):
+        final_kb.append(csv_data)
+    if code_data and run_quality_gate(code_data):
+        final_kb.append(code_data)
+
+    # TODO: Save final_kb to output_path using json.dump
+    final_kb_dicts = [doc.dict() for doc in final_kb]
+    with open(output_path, "w") as f:
+        json.dump(final_kb_dicts, f)
+>>>>>>> main
     # Example:
     # doc = extract_pdf_data(pdf_path)
     # if doc and run_quality_gate(doc):

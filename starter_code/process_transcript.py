@@ -12,9 +12,22 @@ def clean_transcript(file_path):
     # ------------------------------------------
     
     # TODO: Remove noise tokens like [Music], [inaudible], [Laughter]
+<<<<<<< HEAD
     # TODO: Strip timestamps [00:00:00]
     # TODO: Find the price mentioned in Vietnamese words ("năm trăm nghìn")
     # TODO: Return a cleaned dictionary for the UnifiedDocument schema.
     
     return {}
+=======
+    text = re.sub(r'\[.*?\]', '', text)
+    
+    # TODO: Strip timestamps [00:00:00]
+    text = re.sub(r'\[\d{2}:\d{2}:\d{2}\]', '', text)
+    # TODO: Find the price mentioned in Vietnamese words ("năm trăm nghìn")
+    price_pattern = r'(\b\d+\s*(?:nghìn|triệu|tỷ)\b|\b(?:một|hai|ba|bốn|năm|sáu|bảy|tám|chín)\s*(?:nghìn|triệu|tỷ)\b)'
+    price_match = re.search(price_pattern, text, re.IGNORECASE)
+    # TODO: Return a cleaned dictionary for the UnifiedDocument schema.
+    
+    return {price_match.group(0).strip() if price_match else None}
+>>>>>>> main
 
